@@ -7,9 +7,11 @@ env:
   IMAGE_NAME: ${{ vars.DOCKERHUB_ORG_NAME }}/aave_tests
 jobs:
   dockerize:
-    runs-on: ubuntu-20.04
+    runs-on: ["self-hosted", "k8s-prod"]
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Define tag
         id: define-env
         run: |
