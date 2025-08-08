@@ -390,10 +390,23 @@ task('aave:neon', 'Test scenarios on NEON')
 
     console.log('');
     console.log('Performing liquidation ...');
+
+    const txRequest = await lendingPool
+      .connect(liquidator)
+      .populateTransaction.liquidationCall(
+        WETH.address,
+        USDC.address,
+        borrower.address,
+        amountToLiquidate,
+        false
+      );
+    const estimatedGas = await liquidator.estimateGas(txRequest);
+
     await waitForTx(
-      await lendingPool
-        .connect(liquidator)
-        .liquidationCall(WETH.address, USDC.address, borrower.address, amountToLiquidate, false),
+      await liquidator.sendTransaction({
+        ...txRequest,
+        gasLimit: estimatedGas.mul(3),
+      }),
       report,
       'Liquidation'
     );
